@@ -1,8 +1,7 @@
-version: '3.4'
- 
 services:
   springboot-service:
     image: shamkumbhar47/backend:githubactionb
+    restart: unless-stopped        # Added
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-service:3306/hrmsportal
       SPRING_DATASOURCE_USERNAME: root
@@ -13,18 +12,20 @@ services:
       - mysql-service
     networks:
       - mynetwork
-   
+       
   frontend:
     image: shamkumbhar47/frontend:hrmstej04
+    restart: unless-stopped        # Added
     ports:
       - "4200:80"
     depends_on:
       - mysql-service
     networks:
       - mynetwork
- 
+     
   mysql-service:
     image: mysql:8.0
+    restart: unless-stopped        # Added
     environment:
       MYSQL_ROOT_PASSWORD: "root"
       MYSQL_DATABASE: "hrmsportal"
@@ -35,9 +36,10 @@ services:
       - mysql-data:/var/lib/mysql
     networks:
       - mynetwork
-    
+        
 networks:
   mynetwork:
 
 volumes:
   mysql-data:
+
