@@ -1,6 +1,6 @@
 services:
   springboot-service:
-    image: shamkumbhar47/backend:githubactionb
+    image: rushikeshgoal/backend:githubactionb
     restart: unless-stopped        # Added
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-service:3306/hrmsportal
@@ -14,7 +14,7 @@ services:
       - mynetwork
        
   frontend:
-    image: shamkumbhar47/frontend:hrmstej04
+    image: rushikeshgoal/frontend:hrmstej04
     restart: unless-stopped        # Added
     ports:
       - "4200:80"
