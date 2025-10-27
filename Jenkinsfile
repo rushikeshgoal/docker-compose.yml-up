@@ -2,73 +2,59 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_CREDENTIALS = 'dockerhub-cred'   // Jenkins credentials ID for Docker Hub
-        DOCKERHUB_USER = 'rushikeshdoc'             // your Docker Hub username
+        DOCKERHUB_USER = 'rushikeshdoc'
         BACKEND_IMAGE = 'backend:githubactionb'
         FRONTEND_IMAGE = 'frontend:hrmstej04'
+        COMPOSE_FILE = 'docker-compose.yml'
     }
 
     stages {
-
         stage('Checkout') {
             steps {
-                echo '📦 Cloning source code...'
-                git branch: 'main', url: 'https://github.com/rushikeshgoal/docker-compose.yml-up.git'  // change this to your actual repo
+                echo "📦 Cloning source code..."
+                checkout scm
             }
         }
 
         stage('Build Backend Docker Image') {
             steps {
-                script {
-                    echo '⚙️ Building Spring Boot backend image...'
-                    sh 'docker build -t ${DOCKERHUB_USER}/${BACKEND_IMAGE} ./src/backend'
-                }
+                echo "⚙️ Building Spring Boot backend image..."
+                sh "docker build -t ${DOCKERHUB_USER}/${BACKEND_IMAGE} ./backend"
             }
         }
 
         stage('Build Frontend Docker Image') {
             steps {
-                script {
-                    echo '⚙️ Building Angular frontend image...'
-                    sh 'docker build -t ${DOCKERHUB_USER}/${FRONTEND_IMAGE} ./src/frontend'
-                }
+                echo "⚙️ Building Angular frontend image..."
+                sh "docker build -t ${DOCKERHUB_USER}/${FRONTEND_IMAGE} ./frontend"
             }
         }
 
         stage('Push Images to Docker Hub') {
             steps {
-                script {
-                    echo '🚀 Pushing images to Docker Hub...'
-                    withCredentials([usernamePassword(credentialsId: "${DOCKER_HUB_CREDENTIALS}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        sh '''
-                            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                            docker push ${DOCKERHUB_USER}/${BACKEND_IMAGE}
-                            docker push ${DOCKERHUB_USER}/${FRONTEND_IMAGE}
-                        '''
-                    }
+                echo "🚀 Pushing images to Docker Hub..."
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh "echo $PASSWORD | docker login -u $USERNAME --password-stdin"
+                    sh "docker push ${DOCKERHUB_USER}/${BACKEND_IMAGE}"
+                    sh "docker push ${DOCKERHUB_USER}/${FRONTEND_IMAGE}"
                 }
             }
         }
 
-        stage('Deploy using Docker Compose') {
+        stage('Deploy with Docker Compose') {
             steps {
-                script {
-                    echo '🐳 Deploying containers using docker-compose...'
-                    sh '''
-                        docker compose down
-                        docker compose up -d
-                    '''
-                }
+                echo "📂 Deploying services with Docker Compose..."
+                sh "docker-compose -f ${COMPOSE_FILE} up -d"
             }
         }
     }
 
     post {
         success {
-            echo '✅ Deployment successful! Your HRMS app is live.'
+            echo "✅ Deployment successful!"
         }
         failure {
-            echo '❌ Deployment failed. Check console output for errors.'
+            echo "❌ Deployment failed. Check console output for errors."
         }
     }
 }
