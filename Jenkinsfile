@@ -21,7 +21,7 @@ pipeline {
             steps {
                 script {
                     echo '⚙️ Building Spring Boot backend image...'
-                    sh 'docker build -t ${DOCKERHUB_USER}/${BACKEND_IMAGE} ./backend'
+                    sh 'sudo docker build -t ${DOCKERHUB_USER}/${BACKEND_IMAGE} ./src/backend'
                 }
             }
         }
@@ -30,7 +30,7 @@ pipeline {
             steps {
                 script {
                     echo '⚙️ Building Angular frontend image...'
-                    sh 'docker build -t ${DOCKERHUB_USER}/${FRONTEND_IMAGE} ./frontend'
+                    sh 'sudo docker build -t ${DOCKERHUB_USER}/${FRONTEND_IMAGE} ./src/frontend'
                 }
             }
         }
