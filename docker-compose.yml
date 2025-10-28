@@ -14,7 +14,6 @@ services:
       - mynetwork
        
   frontend:
-    build:
     image: rushikeshgoal/frontend:hrmstej04
     restart: unless-stopped        # Added
     ports:
